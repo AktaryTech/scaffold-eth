@@ -68,6 +68,37 @@ const localProvider = new JsonRpcProvider(localProviderUrlFromEnv);
 // 🔭 block explorer URL
 const blockExplorer = targetNetwork.blockExplorer;
 
+/*
+  Web3 modal helps us "connect" external wallets:
+*/
+const web3Modal = new Web3Modal({
+  // network: "mainnet", // optional
+  cacheProvider: true, // optional
+  providerOptions: {
+    walletconnect: {
+      package: WalletConnectProvider, // required
+      options: {
+        infuraId: INFURA_ID,
+      },
+    },
+  },
+});
+
+const logoutOfWeb3Modal = async () => {
+  await web3Modal.clearCachedProvider();
+  setTimeout(() => {
+    window.location.reload();
+  }, 1);
+};
+
+if (window.ethereum) {
+  window.ethereum.on("chainChanged", () => {
+    setTimeout(() => {
+      window.location.reload();
+    }, 1);
+  });
+}
+
 function App(props) {
   const mainnetProvider = scaffoldEthProvider && scaffoldEthProvider._network ? scaffoldEthProvider : mainnetInfura;
   if (DEBUG) console.log("🌎 mainnetProvider", mainnetProvider);
@@ -162,37 +193,6 @@ function App(props) {
         {targetNetwork.name}
       </div>
     );
-  }
-
-  /*
-  Web3 modal helps us "connect" external wallets:
-*/
-  const web3Modal = new Web3Modal({
-    // network: "mainnet", // optional
-    cacheProvider: true, // optional
-    providerOptions: {
-      walletconnect: {
-        package: WalletConnectProvider, // required
-        options: {
-          infuraId: INFURA_ID,
-        },
-      },
-    },
-  });
-
-  const logoutOfWeb3Modal = async () => {
-    await web3Modal.clearCachedProvider();
-    setTimeout(() => {
-      window.location.reload();
-    }, 1);
-  };
-
-  if (window.ethereum) {
-    window.ethereum.on("chainChanged", () => {
-      setTimeout(() => {
-        window.location.reload();
-      }, 1);
-    });
   }
 
   const loadWeb3Modal = useCallback(async () => {
