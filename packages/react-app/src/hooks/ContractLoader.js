@@ -4,12 +4,12 @@ import { Contract } from "@ethersproject/contracts";
 import { useState, useEffect } from "react";
 
 /*
-  ~ What it does? ~
+  ~ What does it do? ~
 
   Loads your local contracts and gives options to read values from contracts 
                                               or write transactions into them
 
-  ~ How can I use? ~
+  ~ How can I use it? ~
 
   const readContracts = useContractLoader(localProvider) // or
   const writeContracts = useContractLoader(userProvider)

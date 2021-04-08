@@ -4,11 +4,11 @@ import { Button } from "antd";
 // added display of 0 instead of NaN if gas price is not provided
 
 /*
-  ~ What it does? ~
+  ~ What does it do? ~
 
   Displays gas gauge 
 
-  ~ How can I use? ~
+  ~ How can I use it? ~
 
   <GasGauge 
     gasPrice={gasPrice}
@@ -20,7 +20,6 @@ import { Button } from "antd";
 */
 
 export default function GasGauge(props) {
-  
   return (
     <Button
       onClick={() => {
@@ -29,8 +28,12 @@ export default function GasGauge(props) {
       size="large"
       shape="round"
     >
-      <span style={{ marginRight: 8 }}><span role="img" aria-label="fuelpump">⛽️</span></span>
-      {typeof props.gasPrice == "undefined" ? 0 : parseInt(props.gasPrice, 10) / 10 ** 9}g
+      <span style={{ marginRight: 8 }}>
+        <span role="img" aria-label="fuelpump">
+          ⛽️
+        </span>
+      </span>
+      {typeof props.gasPrice === "undefined" ? 0 : parseInt(props.gasPrice, 10) / 10 ** 9}g
     </Button>
   );
 }

@@ -3,20 +3,20 @@ import { Input, Button, Tooltip } from "antd";
 import Blockies from "react-blockies";
 import { SendOutlined } from "@ant-design/icons";
 import { parseEther } from "@ethersproject/units";
+import { useLookupAddress } from "eth-hooks";
 import { Transactor } from "../helpers";
 import Wallet from "./Wallet";
-import { useLookupAddress } from "eth-hooks";
 
 // improved a bit by converting address to ens if it exists
 // added option to directly input ens name
 // added placeholder option
 
 /*
-  ~ What it does? ~
+  ~ What does it do? ~
 
   Displays a local faucet to send ETH to given address, also wallet is provided
 
-  ~ How can I use? ~
+  ~ How can I use it? ~
 
   <Faucet 
     price={price}
@@ -50,19 +50,20 @@ export default function Faucet(props) {
   const updateAddress = useCallback(
     async newValue => {
       if (typeof newValue !== "undefined") {
-        let address = newValue;
-        if (address.indexOf(".eth") > 0 || address.indexOf(".xyz") > 0) {
+        let newAddress = newValue;
+        if (newAddress.indexOf(".eth") > 0 || newAddress.indexOf(".xyz") > 0) {
           try {
-            const possibleAddress = await props.ensProvider.resolveName(address);
+            const possibleAddress = await props.ensProvider.resolveName(newAddress);
             if (possibleAddress) {
-              address = possibleAddress;
+              newAddress = possibleAddress;
             }
             // eslint-disable-next-line no-empty
           } catch (e) {}
         }
-        setAddress(address);
+        setAddress(newAddress);
       }
     },
+    // eslint-disable-next-line
     [props.ensProvider, props.onChange],
   );
 
@@ -74,10 +75,10 @@ export default function Faucet(props) {
         size="large"
         placeholder={props.placeholder ? props.placeholder : "local faucet"}
         prefix={blockie}
-        //value={address}
+        // value={address}
         value={ens || address}
         onChange={e => {
-          //setAddress(e.target.value);
+          // setAddress(e.target.value);
           updateAddress(e.target.value);
         }}
         suffix={
@@ -93,7 +94,12 @@ export default function Faucet(props) {
               shape="circle"
               icon={<SendOutlined />}
             />
-            <Wallet color="#888888" provider={props.localProvider} ensProvider={props.ensProvider} price={props.price} />
+            <Wallet
+              color="#888888"
+              provider={props.localProvider}
+              ensProvider={props.ensProvider}
+              price={props.price}
+            />
           </Tooltip>
         }
       />

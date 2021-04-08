@@ -8,11 +8,11 @@ import { useState, useEffect } from "react";
 */
 
 /*
-  ~ What it does? ~
+  ~ What does it do? ~
 
   Enables you to load a local contract with custom address
 
-  ~ How can I use? ~
+  ~ How can I use it? ~
 
   const customContract = useCustomContractLoader(localProvider, "YourContract", customAddress)
 
