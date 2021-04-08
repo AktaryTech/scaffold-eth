@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 
 /*
-  ~ What it does? ~
+  ~ What does it do? ~
 
   Enables you to keep track of events 
 
-  ~ How can I use? ~
+  ~ How can I use it? ~
 
   const setPurposeEvents = useEventListener(readContracts, "YourContract", "SetPurpose", localProvider, 1);
 
@@ -17,7 +17,7 @@ import { useState, useEffect } from "react";
   - Specify the provider 
 */
 
-export default function useEventListener(contracts, contractName, eventName, provider, startBlock, args) {
+export default function useEventListener(contracts, contractName, eventName, provider, startBlock) {
   const [updates, setUpdates] = useState([]);
 
   useEffect(() => {
@@ -28,8 +28,8 @@ export default function useEventListener(contracts, contractName, eventName, pro
     if (contracts && contractName && contracts[contractName]) {
       try {
         contracts[contractName].on(eventName, (...args) => {
-          let blockNumber = args[args.length-1].blockNumber
-          setUpdates(messages => [Object.assign({blockNumber},args.pop().args), ...messages]);
+          const blockNumber = args[args.length - 1].blockNumber;
+          setUpdates(messages => [{ blockNumber, ...args.pop().args }, ...messages]);
         });
         return () => {
           contracts[contractName].removeListener(eventName);

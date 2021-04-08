@@ -2,11 +2,11 @@ import { useState, useEffect } from "react";
 import { AddressZero } from "@ethersproject/constants";
 
 /*
-  ~ What it does? ~
+  ~ What does it do? ~
 
   Gets address from given ENS name and provider
 
-  ~ How can I use? ~
+  ~ How can I use it? ~
 
   const addressFromENS = useResolveName(mainnetProvider, "austingriffith.eth");
 
@@ -21,7 +21,7 @@ const useResolveName = (provider, ensName) => {
 
   useEffect(() => {
     if (provider) {
-      provider.resolveName(ensName).then((resolvedAddress) => setAddress(resolvedAddress));
+      provider.resolveName(ensName).then(resolvedAddress => setAddress(resolvedAddress));
     }
   }, [provider, ensName]);
 

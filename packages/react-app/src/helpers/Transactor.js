@@ -1,9 +1,8 @@
 import { hexlify } from "@ethersproject/bytes";
 import { parseUnits } from "@ethersproject/units";
 import { notification } from "antd";
-import { BLOCKNATIVE_DAPPID, } from "../constants";
-
 import Notify from "bnc-notify";
+import { BLOCKNATIVE_DAPPID } from "../constants";
 
 // this should probably just be renamed to "notifier"
 // it is basically just a wrapper around BlockNative's wonderful Notify.js
@@ -44,9 +43,11 @@ export default function Transactor(provider, gasPrice, etherscan) {
           result = await tx;
         } else {
           if (!tx.gasPrice) {
+            // eslint-disable-next-line no-param-reassign
             tx.gasPrice = gasPrice || parseUnits("4.1", "gwei");
           }
           if (!tx.gasLimit) {
+            // eslint-disable-next-line no-param-reassign
             tx.gasLimit = hexlify(120000);
           }
           console.log("RUNNING TX", tx);

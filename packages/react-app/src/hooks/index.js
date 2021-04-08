@@ -10,6 +10,7 @@ export { default as usePoller } from "./Poller";
 export { default as useBalance } from "./Balance";
 export { default as useEventListener } from "./EventListener";
 export { default as useLocalStorage } from "./LocalStorage";
+// eslint-disable-next-line import/no-cycle
 export { default as useLookupAddress } from "./LookupAddress";
 export { default as useResolveName } from "./ResolveName";
 export { default as useNonce } from "./Nonce";

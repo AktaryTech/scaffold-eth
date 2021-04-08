@@ -4,11 +4,11 @@ import usePoller from "./Poller";
 const DEBUG = false;
 
 /*
-  ~ What it does? ~
+  ~ What does it do? ~
 
   Enables you to read values from contracts and keep track of them in the local React states
 
-  ~ How can I use? ~
+  ~ How can I use it? ~
 
   const purpose = useContractReader(readContracts,"YourContract", "purpose")
 
@@ -35,30 +35,43 @@ export default function useContractReader(contracts, contractName, functionName,
     }
   }, [value, onChange]);
 
-  usePoller(async () => {
-    if (contracts && contracts[contractName]) {
-      try {
-        let newValue;
-        if (DEBUG) console.log("CALLING ", contractName, functionName, "with args", args);
-        if (args && args.length > 0) {
-          newValue = await contracts[contractName][functionName](...args);
-          if (DEBUG)
-            console.log("contractName", contractName, "functionName", functionName, "args", args, "RESULT:", newValue);
-        } else {
-          newValue = await contracts[contractName][functionName]();
+  usePoller(
+    async () => {
+      if (contracts && contracts[contractName]) {
+        try {
+          let newValue;
+          if (DEBUG) console.log("CALLING ", contractName, functionName, "with args", args);
+          if (args && args.length > 0) {
+            newValue = await contracts[contractName][functionName](...args);
+            if (DEBUG)
+              console.log(
+                "contractName",
+                contractName,
+                "functionName",
+                functionName,
+                "args",
+                args,
+                "RESULT:",
+                newValue,
+              );
+          } else {
+            newValue = await contracts[contractName][functionName]();
+          }
+          if (formatter && typeof formatter === "function") {
+            newValue = formatter(newValue);
+          }
+          // console.log("GOT VALUE",newValue)
+          if (newValue !== value) {
+            setValue(newValue);
+          }
+        } catch (e) {
+          console.log(e);
         }
-        if (formatter && typeof formatter === "function") {
-          newValue = formatter(newValue);
-        }
-        // console.log("GOT VALUE",newValue)
-        if (newValue !== value) {
-          setValue(newValue);
-        }
-      } catch (e) {
-        console.log(e);
       }
-    }
-  }, adjustPollTime, contracts && contracts[contractName]);
+    },
+    adjustPollTime,
+    contracts && contracts[contractName],
+  );
 
   return value;
 }

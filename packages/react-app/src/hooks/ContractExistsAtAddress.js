@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import { isAddress } from "@ethersproject/address";
 
 /*
-  ~ What it does? ~
+  ~ What does it do? ~
 
   Checks whether a contract exists on the blockchain, returns true if it exists, otherwise false
 
-  ~ How can I use? ~
+  ~ How can I use it? ~
 
   const contractIsDeployed = useContractExistsAtAddress(localProvider, contractAddress);
 

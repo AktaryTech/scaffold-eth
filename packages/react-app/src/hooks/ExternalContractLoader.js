@@ -8,11 +8,11 @@ import { useState, useEffect } from "react";
 */
 
 /*
-  ~ What it does? ~
+  ~ What does it do? ~
 
   Enables you to load an existing mainnet DAI contract using the provider, address and abi
 
-  ~ How can I use? ~
+  ~ How can I use it? ~
 
   const mainnetDAIContract = useExternalContractLoader(mainnetProvider, DAI_ADDRESS, DAI_ABI)
 
@@ -37,11 +37,11 @@ export default function useExternalContractLoader(provider, address, ABI, option
           }
 
           const customContract = new Contract(address, ABI, signer);
-          if(optionalBytecode) customContract.bytecode = optionalBytecode
+          if (optionalBytecode) customContract.bytecode = optionalBytecode;
 
           setContract(customContract);
         } catch (e) {
-          console.log("ERROR LOADING EXTERNAL CONTRACT AT "+address+" (check provider, address, and ABI)!!", e);
+          console.log("ERROR LOADING EXTERNAL CONTRACT AT " + address + " (check provider, address, and ABI)!!", e);
         }
       }
     }
