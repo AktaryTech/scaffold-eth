@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
-import { getAddress } from "@ethersproject/address";
-import useLocalStorage from "./LocalStorage";
+import { useState, useEffect } from 'react';
+import { getAddress } from '@ethersproject/address';
+import useLocalStorage from './LocalStorage';
+import { Provider } from '@ethersproject/providers';
 
 // resolved if(name){} to not save "" into cache
 
@@ -18,7 +19,7 @@ import useLocalStorage from "./LocalStorage";
   - Provide address and get ENS name corresponding to given address
 */
 
-const lookupAddress = async (provider, address) => {
+const lookupAddress = async (provider: Provider, address: string) => {
   try {
     // Accuracy of reverse resolution is not enforced.
     // We then manually ensure that the reported ens name resolves to address
@@ -35,9 +36,9 @@ const lookupAddress = async (provider, address) => {
   return 0;
 };
 
-const useLookupAddress = (provider, address) => {
+const useLookupAddress = (provider: Provider, address: string) => {
   const [ensName, setEnsName] = useState(address);
-  const [ensCache, setEnsCache] = useLocalStorage("ensCache_" + address);
+  const [ensCache, setEnsCache] = useLocalStorage('ensCache_' + address);
 
   useEffect(() => {
     if (ensCache && ensCache.timestamp > Date.now()) {

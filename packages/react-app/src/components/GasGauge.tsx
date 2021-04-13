@@ -1,5 +1,5 @@
-import React from "react";
-import { Button } from "antd";
+import * as React from 'react';
+import { Button } from 'antd';
 
 // added display of 0 instead of NaN if gas price is not provided
 
@@ -19,11 +19,15 @@ import { Button } from "antd";
   - Provide gasPrice={gasPrice} and get current gas gauge
 */
 
-export default function GasGauge(props) {
+interface GasGaugeProps {
+  gasPrice?: string;
+}
+
+export default function GasGauge(props: GasGaugeProps) {
   return (
     <Button
       onClick={() => {
-        window.open("https://ethgasstation.info/");
+        window.open('https://ethgasstation.info/');
       }}
       size="large"
       shape="round"
@@ -33,7 +37,7 @@ export default function GasGauge(props) {
           ⛽️
         </span>
       </span>
-      {typeof props.gasPrice === "undefined" ? 0 : parseInt(props.gasPrice, 10) / 10 ** 9}g
+      {typeof props.gasPrice === 'undefined' ? 0 : parseInt(props.gasPrice, 10) / 10 ** 9}g
     </Button>
   );
 }

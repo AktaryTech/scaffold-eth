@@ -1,11 +1,23 @@
 /* eslint-disable jsx-a11y/accessible-emoji */
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, { useState, useEffect, useCallback } from "react";
-import { Row, Col, Divider } from "antd";
-import tryToDisplay from "./utils";
+import * as React from 'react';
+import { Row, Col, Divider } from 'antd';
+import tryToDisplay from './utils';
 
-const DisplayVariable = ({ contractFunction, functionInfo, refreshRequired, triggerRefresh}) => {
-  const [variable, setVariable] = useState("");
+const { useState, useEffect, useCallback } = React;
+
+interface DisplayVariableProps {
+  functionInfo: {
+    name: string;
+    [key: string]: any;
+  };
+  refreshRequired: boolean;
+  contractFunction(): Promise<any>,
+  triggerRefresh(arg: boolean): void;
+}
+
+const DisplayVariable = ({ contractFunction, functionInfo, refreshRequired, triggerRefresh }: DisplayVariableProps) => {
+  const [variable, setVariable] = useState<string>('');
 
   const refresh = useCallback(async () => {
     try {
@@ -27,7 +39,7 @@ const DisplayVariable = ({ contractFunction, functionInfo, refreshRequired, trig
         <Col
           span={8}
           style={{
-            textAlign: "right",
+            textAlign: 'right',
             opacity: 0.333,
             paddingRight: 6,
             fontSize: 24,

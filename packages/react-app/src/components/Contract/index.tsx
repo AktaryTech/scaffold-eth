@@ -1,28 +1,33 @@
-import React, { useMemo, useState } from "react";
-import { Card } from "antd";
-import { useContractLoader, useContractExistsAtAddress } from "../../hooks";
-import Account from "../Account";
-import DisplayVariable from "./DisplayVariable";
-import FunctionForm from "./FunctionForm";
+import * as React from 'react';
+import { Card } from 'antd';
+import { useContractLoader, useContractExistsAtAddress } from '../../hooks';
+import Account from '../Account';
+import DisplayVariable from './DisplayVariable';
+import FunctionForm from './FunctionForm';
+import { BigNumber, Contract as EthContract, Signer } from 'ethers';
+import { Provider, JsonRpcProvider } from '@ethersproject/providers';
+import { CardSize } from 'antd/lib/card';
+
+const { useMemo, useState } = React;
 
 const noContractDisplay = (
   <div>
-    Loading...{" "}
+    Loading...{' '}
     <div style={{ padding: 32 }}>
-      You need to run{" "}
+      You need to run{' '}
       <span
         className="highlight"
-        style={{ marginLeft: 4, /* backgroundColor: "#f1f1f1", */ padding: 4, borderRadius: 4, fontWeight: "bolder" }}
+        style={{ marginLeft: 4, /* backgroundColor: "#f1f1f1", */ padding: 4, borderRadius: 4, fontWeight: 'bolder' }}
       >
         yarn run chain
-      </span>{" "}
-      and{" "}
+      </span>{' '}
+      and{' '}
       <span
         className="highlight"
-        style={{ marginLeft: 4, /* backgroundColor: "#f1f1f1", */ padding: 4, borderRadius: 4, fontWeight: "bolder" }}
+        style={{ marginLeft: 4, /* backgroundColor: "#f1f1f1", */ padding: 4, borderRadius: 4, fontWeight: 'bolder' }}
       >
         yarn run deploy
-      </span>{" "}
+      </span>{' '}
       to see your contract here.
     </div>
     <div style={{ padding: 32 }}>
@@ -32,18 +37,31 @@ const noContractDisplay = (
       Warning: You might need to run
       <span
         className="highlight"
-        style={{ marginLeft: 4, /* backgroundColor: "#f1f1f1", */ padding: 4, borderRadius: 4, fontWeight: "bolder" }}
+        style={{ marginLeft: 4, /* backgroundColor: "#f1f1f1", */ padding: 4, borderRadius: 4, fontWeight: 'bolder' }}
       >
         yarn run deploy
-      </span>{" "}
+      </span>{' '}
       <i>again</i> after the frontend comes up!
     </div>
   </div>
 );
 
-const isQueryable = fn => (fn.stateMutability === "view" || fn.stateMutability === "pure") && fn.inputs.length === 0;
+const isQueryable = (fn: { stateMutability: string; inputs: any[] }) => (fn.stateMutability === 'view' || fn.stateMutability === 'pure') && fn.inputs.length === 0;
 
-export default function Contract({
+interface ContractProps {
+  customContract?: EthContract;
+  address: string;
+  account?: string;
+  gasPrice?: BigNumber;
+  signer: Signer;
+  provider: JsonRpcProvider;
+  name: string;
+  show?: string[];
+  price: number;
+  blockExplorer: string;
+}
+
+const Contract = ({
   customContract,
   account,
   gasPrice,
@@ -53,23 +71,23 @@ export default function Contract({
   show,
   price,
   blockExplorer,
-}) {
-  const contracts = useContractLoader(provider);
-  let contract;
+}: ContractProps) => {
+  const contracts: any = useContractLoader(provider);
+  let contract: EthContract;
   if (!customContract) {
-    contract = contracts ? contracts[name] : "";
+    contract = contracts ? contracts[name] : '';
   } else {
     contract = customContract;
   }
 
-  const address = contract ? contract.address : "";
+  const address = contract ? contract.address : '';
   const contractIsDeployed = useContractExistsAtAddress(provider, address);
 
   const displayedContractFunctions = useMemo(
     () =>
       contract
         ? Object.values(contract.interface.functions).filter(
-            fn => fn.type === "function" && !(show && show.indexOf(fn.name) < 0),
+            fn => fn.type === 'function' && !(show && show.indexOf(fn.name) < 0),
           )
         : [],
     [contract, show],
@@ -92,9 +110,9 @@ export default function Contract({
     // If there are inputs, display a form to allow users to provide these
     return (
       <FunctionForm
-        key={"FF" + fn.name}
+        key={'FF' + fn.name}
         contractFunction={
-          fn.stateMutability === "view" || fn.stateMutability === "pure"
+          fn.stateMutability === 'view' || fn.stateMutability === 'pure'
             ? contract[fn.name]
             : contract.connect(signer)[fn.name]
         }
@@ -107,12 +125,12 @@ export default function Contract({
   });
 
   return (
-    <div style={{ margin: "auto", width: "70vw" }}>
+    <div style={{ margin: 'auto', width: '70vw' }}>
       <Card
         title={
           <div>
             {name}
-            <div style={{ float: "right" }}>
+            <div style={{ float: 'right' }}>
               <Account
                 address={address}
                 localProvider={provider}
@@ -125,12 +143,14 @@ export default function Contract({
             </div>
           </div>
         }
-        size="large"
-        style={{ marginTop: 25, width: "100%" }}
+        size={'large' as CardSize}
+        style={{ marginTop: 25, width: '100%' }}
         loading={contractDisplay && contractDisplay.length <= 0}
       >
         {contractIsDeployed ? contractDisplay : noContractDisplay}
       </Card>
     </div>
   );
-}
+};
+
+export default Contract;

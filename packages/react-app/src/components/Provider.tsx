@@ -1,32 +1,47 @@
-import React, { useState } from "react";
-import { Button, Badge } from "antd";
-import { usePoller, useBlockNumber } from "eth-hooks";
+import * as React from 'react';
+import { Button, Badge } from 'antd';
+import { usePoller, useBlockNumber } from 'eth-hooks';
 // import { WalletOutlined } from '@ant-design/icons';
+import Address from './Address';
+import { JsonRpcSigner, Network, Web3Provider } from '@ethersproject/providers';
 
-import Address from "./Address";
+const { useState } = React;
 
-export default function Provider(props) {
-  const [showMore, setShowMore] = useState(false);
-  const [status, setStatus] = useState("processing");
-  const [network, setNetwork] = useState();
-  const [signer, setSigner] = useState();
-  const [address, setAddress] = useState();
+enum StatusEnums {
+  Processing = "processing",
+  Success = "success",
+  Warning = "warning",
+  Error = "error",
+  Default = "default",
+}
+
+interface ProviderProps {
+  provider: Web3Provider;
+  name: string;
+}
+
+export default function Provider(props: ProviderProps) {
+  const [showMore, setShowMore] = useState<boolean>(false);
+  const [status, setStatus] = useState<StatusEnums>(StatusEnums.Processing);
+  const [network, setNetwork] = useState<Network>();
+  const [signer, setSigner] = useState<JsonRpcSigner>();
+  const [address, setAddress] = useState<string>();
 
   const blockNumber = useBlockNumber(props.provider);
 
   usePoller(async () => {
-    if (props.provider && typeof props.provider.getNetwork === "function") {
+    if (props.provider && typeof props.provider.getNetwork === 'function') {
       try {
         const newNetwork = await props.provider.getNetwork();
         setNetwork(newNetwork);
         if (newNetwork.chainId > 0) {
-          setStatus("success");
+          setStatus(StatusEnums.Success);
         } else {
-          setStatus("warning");
+          setStatus(StatusEnums.Warning);
         }
       } catch (e) {
         console.log(e);
-        setStatus("processing");
+        setStatus(StatusEnums.Processing);
       }
       try {
         const newSigner = await props.provider.getSigner();
@@ -39,8 +54,8 @@ export default function Provider(props) {
   }, 1377);
 
   if (
-    typeof props.provider === "undefined" ||
-    typeof props.provider.getNetwork !== "function" ||
+    typeof props.provider === 'undefined' ||
+    typeof props.provider.getNetwork !== 'function' ||
     !network ||
     !network.chainId
   ) {
@@ -57,24 +72,24 @@ export default function Provider(props) {
     );
   }
 
-  let showExtra = "";
+  let showExtra = <></>;
   if (showMore) {
     showExtra = (
       <span>
         <span style={{ padding: 3 }}>
           id:
-          {network ? network.chainId : ""}
+          {network ? network.chainId : ''}
         </span>
         <span style={{ padding: 3 }}>
           name:
-          {network ? network.name : ""}
+          {network ? network.name : ''}
         </span>
       </span>
     );
   }
 
-  let showWallet = "";
-  if (typeof signer !== "undefined" && address) {
+  let showWallet = <></>;
+  if (typeof signer !== 'undefined' && address) {
     showWallet = (
       <span>
         <span style={{ padding: 3 }}>

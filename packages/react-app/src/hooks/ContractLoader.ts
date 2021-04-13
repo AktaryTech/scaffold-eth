@@ -1,7 +1,9 @@
 /* eslint-disable import/no-dynamic-require */
 /* eslint-disable global-require */
-import { Contract } from "@ethersproject/contracts";
-import { useState, useEffect } from "react";
+import { Signer } from '@ethersproject/abstract-signer';
+import { Contract } from '@ethersproject/contracts';
+import { Provider } from '@ethersproject/providers';
+import { useState, useEffect } from 'react';
 
 /*
   ~ What does it do? ~
@@ -25,8 +27,8 @@ import { useState, useEffect } from "react";
     tx( writeContracts.YourContract.setPurpose(newPurpose) )
 */
 
-const loadContract = (contractName, signer) => {
-  const newContract = new Contract(
+const loadContract = (contractName: string, signer: Signer): Contract => {
+  const newContract: any = new Contract(
     require(`../contracts/${contractName}.address.js`),
     require(`../contracts/${contractName}.abi.js`),
     signer,
@@ -39,16 +41,16 @@ const loadContract = (contractName, signer) => {
   return newContract;
 };
 
-export default function useContractLoader(providerOrSigner) {
-  const [contracts, setContracts] = useState();
+export default function useContractLoader(providerOrSigner: any) {
+  const [contracts, setContracts] = useState<{ [key: string]: Contract }>();
   useEffect(() => {
     async function loadContracts() {
-      if (typeof providerOrSigner !== "undefined") {
+      if (typeof providerOrSigner !== 'undefined') {
         try {
           // we need to check to see if this providerOrSigner has a signer or not
-          let signer;
+          let signer: Signer;
           let accounts;
-          if (providerOrSigner && typeof providerOrSigner.listAccounts === "function") {
+          if (providerOrSigner && typeof providerOrSigner.listAccounts === 'function') {
             accounts = await providerOrSigner.listAccounts();
           }
 
@@ -58,15 +60,15 @@ export default function useContractLoader(providerOrSigner) {
             signer = providerOrSigner;
           }
 
-          const contractList = require("../contracts/contracts.js");
+          const contractList: string[] = require('../contracts/contracts.js');
 
-          const newContracts = contractList.reduce((accumulator, contractName) => {
+          const newContracts = contractList.reduce((accumulator: { [key: string]: Contract }, contractName: string) => {
             accumulator[contractName] = loadContract(contractName, signer);
             return accumulator;
           }, {});
           setContracts(newContracts);
         } catch (e) {
-          console.log("ERROR LOADING CONTRACTS!!", e);
+          console.log('ERROR LOADING CONTRACTS!!', e);
         }
       }
     }

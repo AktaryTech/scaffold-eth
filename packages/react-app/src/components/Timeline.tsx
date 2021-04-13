@@ -1,18 +1,29 @@
-import React from "react";
-import Blockies from "react-blockies";
-import { Timeline, Typography } from "antd";
-import { SendOutlined, DownloadOutlined, EditOutlined } from "@ant-design/icons";
+import * as React from 'react';
+import Blockies from 'react-blockies';
+import { Timeline, Typography } from 'antd';
+import { SendOutlined, DownloadOutlined, EditOutlined } from '@ant-design/icons';
 
 const { Text } = Typography;
 
 // displays a timeline for scaffold-eth usage
 
-export default function TimelineDisplay(props) {
+interface TimelineDisplayProps {
+  chainIsUp: boolean;
+  hasOwner: boolean;
+  isNotSmoort: boolean;
+  address: string;
+  contractAddress: string;
+  hasEther: boolean;
+  contractHasEther: boolean;
+  amOwnerOfContract: boolean;
+}
+
+export default function TimelineDisplay(props: TimelineDisplayProps) {
   return (
     <Timeline mode="right">
       <Timeline.Item dot="💾">
         <Text delete>
-          Clone and Install from the{" "}
+          Clone and Install from the{' '}
           <a target="_blank" rel="noopener noreferrer" href="https://github.com/austintgriffith/scaffold-eth">
             github repo
           </a>
@@ -43,34 +54,34 @@ export default function TimelineDisplay(props) {
         </Text>
       </Timeline.Item>
 
-      <Timeline.Item dot={<SendOutlined style={{ fontSize: "16px" }} />} color={props.hasEther ? "green" : "blue"}>
+      <Timeline.Item dot={<SendOutlined style={{ fontSize: '16px' }} />} color={props.hasEther ? 'green' : 'blue'}>
         <Text delete={props.hasEther}>
-          Send test ether to your{" "}
-          <Blockies seed={(props.address ? props.address : "").toLowerCase()} size={8} scale={2} /> address using
+          Send test ether to your{' '}
+          <Blockies seed={(props.address ? props.address : '').toLowerCase()} size={8} scale={2} /> address using
           (bottom left) faucet
         </Text>
       </Timeline.Item>
 
       <Timeline.Item
-        dot={<DownloadOutlined style={{ fontSize: "16px" }} />}
-        color={props.contractHasEther ? "green" : "blue"}
+        dot={<DownloadOutlined style={{ fontSize: '16px' }} />}
+        color={props.contractHasEther ? 'green' : 'blue'}
       >
         <Text delete={props.contractHasEther}>
-          Deposit some funds into your{" "}
-          <Blockies seed={(props.contractAddress ? props.contractAddress : "").toLowerCase()} size={8} scale={2} />{" "}
+          Deposit some funds into your{' '}
+          <Blockies seed={(props.contractAddress ? props.contractAddress : '').toLowerCase()} size={8} scale={2} />{' '}
           smart contract wallet
         </Text>
       </Timeline.Item>
 
       <Timeline.Item
-        dot={<EditOutlined style={{ fontSize: "16px" }} />}
-        color={props.amOwnerOfContract ? "green" : "blue"}
+        dot={<EditOutlined style={{ fontSize: '16px' }} />}
+        color={props.amOwnerOfContract ? 'green' : 'blue'}
       >
         <Text delete={props.amOwnerOfContract}>
-          Set <b>owner</b> of your{" "}
-          <Blockies seed={(props.contractAddress ? props.contractAddress : "").toLowerCase()} size={8} scale={2} />{" "}
-          smart contract wallet to your{" "}
-          <Blockies seed={(props.address ? props.address : "").toLowerCase()} size={8} scale={2} /> address
+          Set <b>owner</b> of your{' '}
+          <Blockies seed={(props.contractAddress ? props.contractAddress : '').toLowerCase()} size={8} scale={2} />{' '}
+          smart contract wallet to your{' '}
+          <Blockies seed={(props.address ? props.address : '').toLowerCase()} size={8} scale={2} /> address
         </Text>
       </Timeline.Item>
 
@@ -89,7 +100,7 @@ export default function TimelineDisplay(props) {
 
       <Timeline.Item dot="🚀">
         <Text>
-          Build something awesome with 🏗 <a href="https://github.com/austintgriffith/scaffold-eth">scaffold-eth</a> and{" "}
+          Build something awesome with 🏗 <a href="https://github.com/austintgriffith/scaffold-eth">scaffold-eth</a> and{' '}
           <a target="_blank" rel="noopener noreferrer" href="https://twitter.com/austingriffith">
             @ me
           </a>
@@ -99,15 +110,15 @@ export default function TimelineDisplay(props) {
 
       <Timeline.Item dot="📖">
         <Text>
-          Read more about{" "}
+          Read more about{' '}
           <a target="_blank" rel="noopener noreferrer" href="https://ethereum.org/developers">
             Ethereum
           </a>
-          ,{" "}
+          ,{' '}
           <a target="_blank" rel="noopener noreferrer" href="https://solidity.readthedocs.io/en/develop/contracts.html">
             Solidity
           </a>
-          , and{" "}
+          , and{' '}
           <a target="_blank" rel="noopener noreferrer" href="https://buidler.dev/tutorial">
             Buidler
           </a>

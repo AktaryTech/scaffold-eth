@@ -1,15 +1,19 @@
-import React, { useState } from "react";
-import { WalletOutlined, QrcodeOutlined, SendOutlined, KeyOutlined } from "@ant-design/icons";
-import { Tooltip, Spin, Modal, Button, Typography } from "antd";
-import QR from "qrcode.react";
-import { parseEther } from "@ethersproject/units";
-import { useUserAddress } from "eth-hooks";
-import { ethers } from "ethers";
-import { Transactor } from "../helpers";
-import Address from "./Address";
-import Balance from "./Balance";
-import AddressInput from "./AddressInput";
-import EtherInput from "./EtherInput";
+import * as React from 'react';
+import { WalletOutlined, QrcodeOutlined, SendOutlined, KeyOutlined } from '@ant-design/icons';
+import { Tooltip, Spin, Modal, Button, Typography } from 'antd';
+import * as QR from 'qrcode.react';
+import { parseEther } from '@ethersproject/units';
+import { useUserAddress } from 'eth-hooks';
+import { BytesLike, ethers } from 'ethers';
+import { Transactor } from '../helpers';
+import Address from './Address';
+import Balance from './Balance';
+import AddressInput from './AddressInput';
+import EtherInput from './EtherInput';
+import { Provider, Web3Provider } from '@ethersproject/providers';
+import { SigningKey } from '@ethersproject/signing-key';
+
+const { useState } = React;
 
 const { Text, Paragraph } = Typography;
 
@@ -41,15 +45,23 @@ const { Text, Paragraph } = Typography;
   - Provide color to specify the color of wallet icon
 */
 
-export default function Wallet(props) {
+interface WalletProps {
+  provider: Web3Provider;
+  address: string;
+  color?: string;
+  price: number;
+  ensProvider: Provider;
+}
+
+export default function Wallet(props: WalletProps) {
   const signerAddress = useUserAddress(props.provider);
   const selectedAddress = props.address || signerAddress;
 
-  const [open, setOpen] = useState();
-  const [qr, setQr] = useState();
-  const [amount, setAmount] = useState();
-  const [toAddress, setToAddress] = useState();
-  const [pk, setPK] = useState();
+  const [open, setOpen] = useState<boolean>();
+  const [qr, setQr] = useState<string>();
+  const [amount, setAmount] = useState<string>();
+  const [toAddress, setToAddress] = useState<string>('');
+  const [pk, setPK] = useState<BytesLike | SigningKey>();
 
   const providerSend = props.provider ? (
     <Tooltip title="Wallet">
@@ -60,15 +72,15 @@ export default function Wallet(props) {
         rotate={-90}
         style={{
           padding: 7,
-          color: props.color ? props.color : "",
-          cursor: "pointer",
+          color: props.color ? props.color : '',
+          cursor: 'pointer',
           fontSize: 28,
-          verticalAlign: "middle",
+          verticalAlign: 'middle',
         }}
       />
     </Tooltip>
   ) : (
-    ""
+    ''
   );
 
   let display;
@@ -82,7 +94,7 @@ export default function Wallet(props) {
         </div>
         <QR
           value={selectedAddress}
-          size="450"
+          size={450}
           level="H"
           includeMargin
           renderAs="svg"
@@ -94,7 +106,7 @@ export default function Wallet(props) {
       <Button
         key="hide"
         onClick={() => {
-          setQr("");
+          setQr('');
         }}
       >
         <QrcodeOutlined /> Hide
@@ -105,14 +117,14 @@ export default function Wallet(props) {
         key="hide"
         onClick={() => {
           setPK(selectedAddress);
-          setQr("");
+          setQr('');
         }}
       >
         <KeyOutlined /> Private Key
       </Button>
     );
   } else if (pk) {
-    const _pk = localStorage.getItem("metaPrivateKey");
+    const _pk = localStorage.getItem('metaPrivateKey');
     const wallet = new ethers.Wallet(_pk);
 
     if (wallet.address !== selectedAddress) {
@@ -122,12 +134,12 @@ export default function Wallet(props) {
         </div>
       );
     } else {
-      const extraPkDisplayAdded = {};
+      const extraPkDisplayAdded: { [key: string]: boolean } = {};
       const extraPkDisplay = [];
       extraPkDisplayAdded[wallet.address] = true;
       extraPkDisplay.push(
-        <div style={{ fontSize: 16, padding: 2, backgroundStyle: "#89e789" }}>
-          <a href={"/pk#" + _pk}>
+        <div style={{ fontSize: 16, padding: 2, backgroundColor: '#89e789' }}>
+          <a href={'/pk#' + _pk}>
             <Address minimized address={wallet.address} ensProvider={props.ensProvider} /> {wallet.address.substr(0, 6)}
           </a>
         </div>,
@@ -135,16 +147,16 @@ export default function Wallet(props) {
       const localStorageKeys = Object.keys(localStorage);
       for (let i = 0, il = localStorageKeys.length; i < il; i += 1) {
         const key = localStorageKeys[i];
-        if (key.indexOf("metaPrivateKey_backup") >= 0) {
+        if (key.indexOf('metaPrivateKey_backup') >= 0) {
           console.log(key);
-          const pastpk = localStorage.getItem(key);
+          const pastpk = localStorage.getItem(key) as BytesLike | SigningKey;
           const pastwallet = new ethers.Wallet(pastpk);
           if (!extraPkDisplayAdded[pastwallet.address] /* && selectedAddress!=pastwallet.address */) {
             extraPkDisplayAdded[pastwallet.address] = true;
             extraPkDisplay.push(
               <div style={{ fontSize: 16 }}>
-                <a href={"/pk#" + pastpk}>
-                  <Address minimized address={pastwallet.address} ensProvider={props.ensProvider} />{" "}
+                <a href={'/pk#' + pastpk}>
+                  <Address minimized address={pastwallet.address} ensProvider={props.ensProvider} />{' '}
                   {pastwallet.address.substr(0, 6)}
                 </a>
               </div>,
@@ -164,22 +176,22 @@ export default function Wallet(props) {
 
           <i>
             Point your camera phone at qr code to open in
-            <a target="_blank" href={"https://xdai.io/" + pk} rel="noopener noreferrer">
+            <a target="_blank" href={'https://xdai.io/' + pk} rel="noopener noreferrer">
               burner wallet
             </a>
             :
           </i>
           <QR
-            value={"https://xdai.io/" + pk}
-            size="450"
+            value={'https://xdai.io/' + pk}
+            size={450}
             level="H"
             includeMargin
             renderAs="svg"
             imageSettings={{ excavate: false }}
           />
 
-          <Paragraph style={{ fontSize: "16" }} copyable>
-            {"https://xdai.io/" + pk}
+          <Paragraph style={{ fontSize: '16' }} copyable>
+            {'https://xdai.io/' + pk}
           </Paragraph>
 
           {extraPkDisplay ? (
@@ -188,13 +200,13 @@ export default function Wallet(props) {
               {extraPkDisplay}
               <Button
                 onClick={() => {
-                  const currentPrivateKey = window.localStorage.getItem("metaPrivateKey");
+                  const currentPrivateKey = window.localStorage.getItem('metaPrivateKey');
                   if (currentPrivateKey) {
-                    window.localStorage.setItem("metaPrivateKey_backup" + Date.now(), currentPrivateKey);
+                    window.localStorage.setItem('metaPrivateKey_backup' + Date.now(), currentPrivateKey);
                   }
                   const randomWallet = ethers.Wallet.createRandom();
                   const privateKey = randomWallet._signingKey().privateKey;
-                  window.localStorage.setItem("metaPrivateKey", privateKey);
+                  window.localStorage.setItem('metaPrivateKey', privateKey);
                   window.location.reload();
                 }}
               >
@@ -202,7 +214,7 @@ export default function Wallet(props) {
               </Button>
             </div>
           ) : (
-            ""
+            ''
           )}
         </div>
       );
@@ -213,7 +225,7 @@ export default function Wallet(props) {
         key="receive"
         onClick={() => {
           setQr(selectedAddress);
-          setPK("");
+          setPK('');
         }}
       >
         <QrcodeOutlined /> Receive
@@ -223,8 +235,8 @@ export default function Wallet(props) {
       <Button
         key="hide"
         onClick={() => {
-          setPK("");
-          setQr("");
+          setPK('');
+          setQr('');
         }}
       >
         <KeyOutlined /> Hide
@@ -242,7 +254,7 @@ export default function Wallet(props) {
             autoFocus
             ensProvider={props.ensProvider}
             placeholder="to address"
-            address={toAddress}
+            value={toAddress}
             onChange={setToAddress}
           />
         </div>
@@ -251,7 +263,7 @@ export default function Wallet(props) {
             price={props.price}
             value={amount}
             onChange={value => {
-              setAmount(value);
+              setAmount(value.toString());
             }}
           />
         </div>
@@ -262,7 +274,7 @@ export default function Wallet(props) {
         key="receive"
         onClick={() => {
           setQr(selectedAddress);
-          setPK("");
+          setPK('');
         }}
       >
         <QrcodeOutlined /> Receive
@@ -273,7 +285,7 @@ export default function Wallet(props) {
         key="hide"
         onClick={() => {
           setPK(selectedAddress);
-          setQr("");
+          setQr('');
         }}
       >
         <KeyOutlined /> Private Key
@@ -289,19 +301,19 @@ export default function Wallet(props) {
         title={
           <div>
             {selectedAddress ? <Address address={selectedAddress} ensProvider={props.ensProvider} /> : <Spin />}
-            <div style={{ float: "right", paddingRight: 25 }}>
+            <div style={{ float: 'right', paddingRight: 25 }}>
               <Balance address={selectedAddress} provider={props.provider} dollarMultiplier={props.price} />
             </div>
           </div>
         }
         onOk={() => {
-          setQr();
-          setPK();
+          setQr('');
+          setPK('');
           setOpen(!open);
         }}
         onCancel={() => {
-          setQr();
-          setPK();
+          setQr('');
+          setPK('');
           setOpen(!open);
         }}
         footer={[
@@ -310,25 +322,28 @@ export default function Wallet(props) {
           <Button
             key="submit"
             type="primary"
-            disabled={!amount || !toAddress || qr}
+            disabled={!!!amount || !!!toAddress || !!qr}
             loading={false}
             onClick={() => {
               const tx = Transactor(props.provider);
 
               let value;
               try {
-                value = parseEther("" + amount);
+                value = parseEther('' + amount);
               } catch (e) {
                 // failed to parseEther, try something else
-                value = parseEther("" + parseFloat(amount).toFixed(8));
+                if (typeof amount !== 'undefined')
+                  value = parseEther('' + parseFloat(amount).toFixed(8));
               }
 
-              tx({
-                to: toAddress,
-                value,
-              });
-              setOpen(!open);
-              setQr();
+              if (tx) {
+                tx({
+                  to: toAddress,
+                  value,
+                });
+                setOpen(!open);
+                setQr('');
+              }
             }}
           >
             <SendOutlined /> Send

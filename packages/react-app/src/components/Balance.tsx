@@ -1,6 +1,10 @@
-import React, { useState } from "react";
-import { formatEther } from "@ethersproject/units";
-import { usePoller } from "eth-hooks";
+import * as React from 'react';
+import { formatEther } from '@ethersproject/units';
+import { usePoller } from 'eth-hooks';
+import { Provider } from '@ethersproject/providers';
+import { BigNumber } from 'ethers';
+
+const { useState } = React;
 
 /*
   ~ What does it do? ~
@@ -28,9 +32,20 @@ import { usePoller } from "eth-hooks";
   - Provide price={price} of ether and get your balance converted to dollars
 */
 
-export default function Balance(props) {
-  const [dollarMode, setDollarMode] = useState(true);
-  const [balance, setBalance] = useState();
+interface BalanceProps {
+  value?: BigNumber;
+  balance?: BigNumber;
+  address?: string;
+  provider?: Provider;
+  pollTime?: number;
+  price?: number;
+  dollarMultiplier?: number;
+  size?: number;
+}
+
+export default function Balance(props: BalanceProps) {
+  const [dollarMode, setDollarMode] = useState<boolean>(true);
+  const [balance, setBalance] = useState<BigNumber>();
 
   const getBalance = async () => {
     if (props.address && props.provider) {
@@ -50,14 +65,14 @@ export default function Balance(props) {
     props.pollTime ? props.pollTime : 1999,
   );
 
-  let floatBalance = parseFloat("0.00");
+  let floatBalance = parseFloat('0.00');
 
   let usingBalance = balance;
 
-  if (typeof props.balance !== "undefined") {
+  if (typeof props.balance !== 'undefined') {
     usingBalance = props.balance;
   }
-  if (typeof props.value !== "undefined") {
+  if (typeof props.value !== 'undefined') {
     usingBalance = props.value;
   }
 
@@ -72,16 +87,16 @@ export default function Balance(props) {
   const price = props.price || props.dollarMultiplier;
 
   if (price && dollarMode) {
-    displayBalance = "$" + (floatBalance * price).toFixed(2);
+    displayBalance = '$' + (floatBalance * price).toFixed(2);
   }
 
   return (
     <span
       style={{
-        verticalAlign: "middle",
+        verticalAlign: 'middle',
         fontSize: props.size ? props.size : 24,
         padding: 8,
-        cursor: "pointer",
+        cursor: 'pointer',
       }}
       onClick={() => {
         setDollarMode(!dollarMode);
