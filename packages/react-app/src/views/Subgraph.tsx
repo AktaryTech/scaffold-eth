@@ -1,29 +1,39 @@
 /* eslint-disable jsx-a11y/accessible-emoji */
 
-import React, { useState } from "react";
-import "antd/dist/antd.css";
-import { Button, Typography, Table, Input } from "antd";
-import { useQuery, gql } from "@apollo/client";
-import GraphiQL from "graphiql";
-import "graphiql/graphiql.min.css";
-import fetch from "isomorphic-fetch";
-import { Address } from "../components";
+import * as React from 'react';
+import 'antd/dist/antd.css';
+import { Button, Typography, Table, Input } from 'antd';
+import { useQuery, gql } from '@apollo/client';
+import GraphiQL from 'graphiql';
+import 'graphiql/graphiql.min.css';
+import * as fetch from 'isomorphic-fetch';
+import { Address } from '../components';
+import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
+
+const { useState } = React;
 
 const highlight = {
   marginLeft: 4,
   marginRight: 8,
   /* backgroundColor: "#f9f9f9", */ padding: 4,
   borderRadius: 4,
-  fontWeight: "bolder",
+  fontWeight: 'bolder' as any,
 };
 
-function Subgraph(props) {
-  function graphQLFetcher(graphQLParams) {
+interface SubgraphProps {
+  subgraphUri: string;
+  mainnetProvider: Web3Provider | JsonRpcProvider;
+  writeContracts: any;
+  tx(arg: any): void;
+}
+
+function Subgraph(props: SubgraphProps) {
+  function graphQLFetcher(graphQLParams: { [key: string]: any }) {
     return fetch(props.subgraphUri, {
-      method: "post",
-      headers: { "Content-Type": "application/json" },
+      method: 'post',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(graphQLParams),
-    }).then(response => response.json());
+    }).then((response: any) => response.json());
   }
 
   const EXAMPLE_GRAPHQL = `
@@ -48,24 +58,24 @@ function Subgraph(props) {
 
   const purposeColumns = [
     {
-      title: "Purpose",
-      dataIndex: "purpose",
-      key: "purpose",
+      title: 'Purpose',
+      dataIndex: 'purpose',
+      key: 'purpose',
     },
     {
-      title: "Sender",
-      key: "id",
-      render: record => <Address value={record.sender.id} ensProvider={props.mainnetProvider} fontSize={16} />,
+      title: 'Sender',
+      key: 'id',
+      render: (record: any) => <Address value={record.sender.id} ensProvider={props.mainnetProvider} fontSize={16} />,
     },
     {
-      title: "createdAt",
-      key: "createdAt",
-      dataIndex: "createdAt",
-      render: d => new Date(d * 1000).toISOString(),
+      title: 'createdAt',
+      key: 'createdAt',
+      dataIndex: 'createdAt',
+      render: (d: number) => new Date(d * 1000).toISOString(),
     },
   ];
 
-  const [newPurpose, setNewPurpose] = useState("loading...");
+  const [newPurpose, setNewPurpose] = useState('loading...');
 
   const deployWarning = (
     <div style={{ marginTop: 8, padding: 8 }}>Warning: 🤔 Have you deployed your subgraph yet?</div>
@@ -73,18 +83,18 @@ function Subgraph(props) {
 
   return (
     <>
-      <div style={{ margin: "auto", marginTop: 32 }}>
-        You will find that parsing/tracking events with the{" "}
+      <div style={{ margin: 'auto', marginTop: 32 }}>
+        You will find that parsing/tracking events with the{' '}
         <span className="highlight" style={highlight}>
           useEventListener
-        </span>{" "}
+        </span>{' '}
         hook becomes a chore for every new project.
       </div>
-      <div style={{ margin: "auto", marginTop: 32 }}>
-        Instead, you can use{" "}
+      <div style={{ margin: 'auto', marginTop: 32 }}>
+        Instead, you can use{' '}
         <a href="https://thegraph.com/docs/introduction" target="_blank" rel="noopener noreferrer">
           The Graph
-        </a>{" "}
+        </a>{' '}
         with 🏗 scaffold-eth (
         <a href="https://youtu.be/T5ylzOTkn-Q" target="_blank" rel="noopener noreferrer">
           learn more
@@ -107,13 +117,13 @@ function Subgraph(props) {
           yarn graph-run-node
         </span>
         <span style={{ marginLeft: 4 }}>
-          {" "}
-          (requires{" "}
+          {' '}
+          (requires{' '}
           <a href="https://www.docker.com/products/docker-desktop" target="_blank" rel="noopener noreferrer">
-            {" "}
+            {' '}
             Docker
           </a>
-          ){" "}
+          ){' '}
         </span>
       </div>
 
@@ -140,7 +150,7 @@ function Subgraph(props) {
         <span className="highlight" style={highlight}>
           packages/subgraph/src
         </span>
-        (learn more about subgraph definition{" "}
+        (learn more about subgraph definition{' '}
         <a href="https://thegraph.com/docs/define-a-subgraph" target="_blank" rel="noopener noreferrer">
           here
         </a>
@@ -155,8 +165,8 @@ function Subgraph(props) {
         </span>
       </div>
 
-      <div style={{ width: 780, margin: "auto", paddingBottom: 64 }}>
-        <div style={{ margin: 32, textAlign: "right" }}>
+      <div style={{ width: 780, margin: 'auto', paddingBottom: 64 }}>
+        <div style={{ margin: 32, textAlign: 'right' }}>
           <Input
             onChange={e => {
               setNewPurpose(e.target.value);
@@ -164,7 +174,7 @@ function Subgraph(props) {
           />
           <Button
             onClick={() => {
-              console.log("newPurpose", newPurpose);
+              console.log('newPurpose', newPurpose);
               /* look how you call setPurpose on your contract: */
               props.tx(props.writeContracts.YourContract.setPurpose(newPurpose));
             }}
@@ -176,10 +186,10 @@ function Subgraph(props) {
         {data ? (
           <Table dataSource={data.purposes} columns={purposeColumns} rowKey="id" />
         ) : (
-          <Typography>{loading ? "Loading..." : deployWarning}</Typography>
+          <Typography>{loading ? 'Loading...' : deployWarning}</Typography>
         )}
 
-        <div style={{ margin: 32, height: 400, border: "1px solid #888888", textAlign: "left" }}>
+        <div style={{ margin: 32, height: 400, border: '1px solid #888888', textAlign: 'left' }}>
           <GraphiQL fetcher={graphQLFetcher} docExplorerOpen query={EXAMPLE_GRAPHQL} />
         </div>
       </div>

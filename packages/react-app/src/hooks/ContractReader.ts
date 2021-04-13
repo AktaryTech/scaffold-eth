@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import usePoller from "./Poller";
+import { useState, useEffect } from 'react';
+import usePoller from './Poller';
 
 const DEBUG = false;
 
@@ -19,18 +19,26 @@ const DEBUG = false;
   - Specify the name of the variable in the contract, in this case we keep track of "purpose" variable
 */
 
-export default function useContractReader(contracts, contractName, functionName, args, pollTime, formatter, onChange) {
+export default function useContractReader(
+  contracts: { [key: string]: any },
+  contractName: string,
+  functionName: string,
+  args: any[],
+  pollTime: number,
+  formatter: (value: any) => any,
+  onChange: () => void,
+) {
   let adjustPollTime = 1777;
   if (pollTime) {
     adjustPollTime = pollTime;
-  } else if (!pollTime && typeof args === "number") {
+  } else if (!pollTime && typeof args === 'number') {
     // it's okay to pass poll time as last argument without args for the call
     adjustPollTime = args;
   }
 
   const [value, setValue] = useState();
   useEffect(() => {
-    if (typeof onChange === "function") {
+    if (typeof onChange === 'function') {
       setTimeout(onChange.bind(this, value), 1);
     }
   }, [value, onChange]);
@@ -40,24 +48,24 @@ export default function useContractReader(contracts, contractName, functionName,
       if (contracts && contracts[contractName]) {
         try {
           let newValue;
-          if (DEBUG) console.log("CALLING ", contractName, functionName, "with args", args);
+          if (DEBUG) console.log('CALLING ', contractName, functionName, 'with args', args);
           if (args && args.length > 0) {
             newValue = await contracts[contractName][functionName](...args);
             if (DEBUG)
               console.log(
-                "contractName",
+                'contractName',
                 contractName,
-                "functionName",
+                'functionName',
                 functionName,
-                "args",
+                'args',
                 args,
-                "RESULT:",
+                'RESULT:',
                 newValue,
               );
           } else {
             newValue = await contracts[contractName][functionName]();
           }
-          if (formatter && typeof formatter === "function") {
+          if (formatter && typeof formatter === 'function') {
             newValue = formatter(newValue);
           }
           // console.log("GOT VALUE",newValue)

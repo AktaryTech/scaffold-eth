@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { JsonRpcProvider, Provider, Web3Provider } from '@ethersproject/providers';
+import { useState, useEffect } from 'react';
 
 /*
   ~ What does it do? ~
@@ -17,17 +18,23 @@ import { useState, useEffect } from "react";
   - Specify the provider 
 */
 
-export default function useEventListener(contracts, contractName, eventName, provider, startBlock) {
-  const [updates, setUpdates] = useState([]);
+export default function useEventListener(
+  contracts: { [key: string]: any },
+  contractName: string,
+  eventName: string,
+  provider: JsonRpcProvider,
+  startBlock: number,
+) {
+  const [updates, setUpdates] = useState<any[]>([]);
 
   useEffect(() => {
-    if (typeof provider !== "undefined" && typeof startBlock !== "undefined") {
+    if (typeof provider !== 'undefined' && typeof startBlock !== 'undefined') {
       // if you want to read _all_ events from your contracts, set this to the block number it is deployed
       provider.resetEventsBlock(startBlock);
     }
     if (contracts && contractName && contracts[contractName]) {
       try {
-        contracts[contractName].on(eventName, (...args) => {
+        contracts[contractName].on(eventName, (...args: any[]) => {
           const blockNumber = args[args.length - 1].blockNumber;
           setUpdates(messages => [{ blockNumber, ...args.pop().args }, ...messages]);
         });
@@ -38,6 +45,7 @@ export default function useEventListener(contracts, contractName, eventName, pro
         console.log(e);
       }
     }
+    return;
   }, [provider, startBlock, contracts, contractName, eventName]);
 
   return updates;

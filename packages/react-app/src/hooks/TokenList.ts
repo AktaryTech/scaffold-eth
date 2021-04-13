@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
 
 /*
   ~ What does it do? ~
@@ -15,10 +15,10 @@ import { useState, useEffect } from "react";
   - Optional - specify chainId to filter by chainId
 */
 
-const useTokenList = (tokenListUri, chainId) => {
+const useTokenList = (tokenListUri: string, chainId?: number) => {
   const [tokenList, setTokenList] = useState([]);
 
-  const _tokenListUri = tokenListUri || "https://gateway.ipfs.io/ipns/tokens.uniswap.org";
+  const _tokenListUri = tokenListUri || 'https://gateway.ipfs.io/ipns/tokens.uniswap.org';
 
   useEffect(() => {
     const getTokenList = async () => {
@@ -29,7 +29,7 @@ const useTokenList = (tokenListUri, chainId) => {
         let _tokenList;
 
         if (chainId) {
-          _tokenList = tokenListJson.tokens.filter(t => {
+          _tokenList = tokenListJson.tokens.filter((t: any) => {
             return t.chainId === chainId;
           });
         } else {

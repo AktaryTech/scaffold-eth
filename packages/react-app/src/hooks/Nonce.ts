@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { Provider } from '@ethersproject/providers';
+import { useState } from 'react';
 
-export default function useNonce(mainnetProvider, address) {
+export default function useNonce(mainnetProvider: Provider, address: string) {
   const [nonce, setNonce] = useState(0);
 
   const Nonce = () => {

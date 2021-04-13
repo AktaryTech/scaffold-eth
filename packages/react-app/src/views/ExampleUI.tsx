@@ -1,10 +1,28 @@
 /* eslint-disable jsx-a11y/accessible-emoji */
 
-import React, { useState } from 'react';
+import * as React from 'react';
 import { Button, List, Divider, Input, Card, DatePicker, Slider, Switch, Progress, Spin } from 'antd';
 import { SyncOutlined } from '@ant-design/icons';
 import { parseEther, formatEther } from '@ethersproject/units';
 import { Address, Balance } from '../components';
+import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
+import { BigNumberish, Contract } from 'ethers';
+
+const { useState } = React;
+
+interface ExampleUIProps {
+  purpose: string;
+  address: string;
+  mainnetProvider: Web3Provider | JsonRpcProvider;
+  localProvider: Web3Provider | JsonRpcProvider;
+  userProvider: Web3Provider | JsonRpcProvider;
+  yourLocalBalance: BigNumberish;
+  price: number;
+  setPurposeEvents: any[];
+  readContracts: { [key: string]: Contract };
+  writeContracts: { [key: string]: Contract };
+  tx(...args: any[]): void,
+}
 
 export default function ExampleUI({
   purpose,
@@ -18,7 +36,7 @@ export default function ExampleUI({
   tx,
   readContracts,
   writeContracts,
-}) {
+}: ExampleUIProps) {
   const [newPurpose, setNewPurpose] = useState('loading...');
 
   return (

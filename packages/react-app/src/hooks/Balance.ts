@@ -1,5 +1,7 @@
-import { useState } from "react";
-import usePoller from "./Poller";
+import { Provider } from '@ethersproject/providers';
+import { BigNumber } from 'ethers';
+import { useState } from 'react';
+import usePoller from './Poller';
 
 /*
   ~ What does it do? ~
@@ -16,8 +18,8 @@ import usePoller from "./Poller";
   - Change provider to access balance on different chains (ex. mainnetProvider)
 */
 
-export default function useBalance(provider, address) {
-  const [balance, setBalance] = useState();
+export default function useBalance(provider: Provider, address: string): BigNumber | undefined {
+  const [balance, setBalance] = useState<BigNumber>();
   const pollBalance = async () => {
     if (address && provider) {
       const newBalance = await provider.getBalance(address);

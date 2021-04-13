@@ -1,8 +1,9 @@
-import { useState } from "react";
-import { Token, WETH, Fetcher, Route } from "@uniswap/sdk";
-import { usePoller } from "eth-hooks";
+import { useState } from 'react';
+import { Token, WETH, Fetcher, Route } from '@uniswap/sdk';
+import { usePoller } from 'eth-hooks';
+import { JsonRpcProvider } from '@ethersproject/providers';
 
-export default function useExchangePrice(targetNetwork, mainnetProvider, pollTime) {
+export default function useExchangePrice(targetNetwork: { price?: number }, mainnetProvider: JsonRpcProvider, pollTime: number) {
   const [price, setPrice] = useState(0);
 
   const pollPrice = () => {
@@ -12,7 +13,7 @@ export default function useExchangePrice(targetNetwork, mainnetProvider, pollTim
       } else {
         const DAI = new Token(
           mainnetProvider.network ? mainnetProvider.network.chainId : 1,
-          "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+          '0x6B175474E89094C44Da98b954EedeAC495271d0F',
           18,
         );
         const pair = await Fetcher.fetchPairData(DAI, WETH[DAI.chainId], mainnetProvider);
