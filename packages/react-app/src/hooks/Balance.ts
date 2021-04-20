@@ -1,4 +1,4 @@
-import { Provider } from '@ethersproject/providers';
+import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
 import { BigNumber } from 'ethers';
 import { useState } from 'react';
 import usePoller from './Poller';
@@ -18,7 +18,7 @@ import usePoller from './Poller';
   - Change provider to access balance on different chains (ex. mainnetProvider)
 */
 
-export default function useBalance(provider: Provider, address: string): BigNumber | undefined {
+export default function useBalance(provider: Web3Provider | JsonRpcProvider, address: string): BigNumber | undefined {
   const [balance, setBalance] = useState<BigNumber>();
   const pollBalance = async () => {
     if (address && provider) {
@@ -29,7 +29,7 @@ export default function useBalance(provider: Provider, address: string): BigNumb
       }
     }
   };
-  usePoller(pollBalance, 27777, address && provider);
+  usePoller(pollBalance, 27777, !!address && !!provider);
 
   return balance;
 }

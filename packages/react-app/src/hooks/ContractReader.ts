@@ -1,3 +1,4 @@
+import { Contract } from '@ethersproject/contracts';
 import { useState, useEffect } from 'react';
 import usePoller from './Poller';
 
@@ -20,13 +21,13 @@ const DEBUG = false;
 */
 
 export default function useContractReader(
-  contracts: { [key: string]: any },
+  contracts: { [key: string]: Contract },
   contractName: string,
   functionName: string,
-  args: any[],
-  pollTime: number,
-  formatter: (value: any) => any,
-  onChange: () => void,
+  args?: any[],
+  onChange?: () => void,
+  formatter?: (value: any) => any,
+  pollTime?: number,
 ) {
   let adjustPollTime = 1777;
   if (pollTime) {
@@ -78,7 +79,7 @@ export default function useContractReader(
       }
     },
     adjustPollTime,
-    contracts && contracts[contractName],
+    !!contracts && !!contracts[contractName],
   );
 
   return value;

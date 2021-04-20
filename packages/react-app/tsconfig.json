@@ -20,6 +20,12 @@
     "jsx": "react"
   },
   "include": [
-    "src"
+    "**/*.ts",
+    "**/*.tsx"
+  ],
+  "exclude": [
+    "node_modules",
+    "public",
+    "scripts"
   ]
 }

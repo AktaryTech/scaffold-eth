@@ -19,11 +19,12 @@ import {
   useExternalContractLoader,
 } from './hooks';
 import { Header, Account, Faucet, Ramp, Contract as ContractComponent, GasGauge, ThemeSwitch } from './components';
-import { Transactor } from './helpers';
+import { Notifier } from './helpers';
 // import Hints from "./Hints";
 import { Hints, ExampleUI, Subgraph } from './views';
-import { INFURA_ID, DAI_ADDRESS, DAI_ABI, NETWORK, NETWORKS } from './constants';
-import { Contract } from 'ethers';
+import { INFURA_ID, DAI_ADDRESS, DAI_ABI, NETWORK, NETWORKS, SpeedEnums } from './constants';
+import { Contract } from '@ethersproject/contracts';
+import { BigNumber } from '@ethersproject/bignumber';
 
 const { useCallback, useEffect, useState } = React;
 
@@ -103,6 +104,8 @@ if (window.ethereum) {
   });
 }
 
+const toBN = (input: number) => BigNumber.from(input);
+
 interface AppProps {
   subgraphUri: string;
 }
@@ -111,12 +114,14 @@ function App(props: AppProps) {
   const mainnetProvider = scaffoldEthProvider && scaffoldEthProvider._network ? scaffoldEthProvider : mainnetInfura;
   if (DEBUG) console.log('🌎 mainnetProvider', mainnetProvider);
 
-  const [injectedProvider, setInjectedProvider] = useState<Provider>();
-  /* 💵 This hook will get the price of ETH from 🦄 Uniswap: */
-  const price = useExchangePrice(targetNetwork, mainnetProvider);
+  /***** State *****/
 
-  /* 🔥 This hook will get the price of Gas from ⛽️ EtherGasStation */
-  const gasPrice = useGasPrice(targetNetwork, 'fast');
+  const [injectedProvider, setInjectedProvider] = useState<Web3Provider | JsonRpcProvider>();
+
+  /***** Hooks *****/
+
+  const ethPrice = useExchangePrice(targetNetwork, mainnetProvider);
+  const gasPrice = useGasPrice(targetNetwork, SpeedEnums.Fast);
   // Use your injected provider from 🦊 Metamask or if you don't have it then instantly generate a 🔥 burner wallet.
   const userProvider = useUserProvider(injectedProvider, localProvider);
   const address = useUserAddress(userProvider);
@@ -132,10 +137,10 @@ function App(props: AppProps) {
   // For more hooks, check out 🔗eth-hooks at: https://www.npmjs.com/package/eth-hooks
 
   // The transactor wraps transactions and provides notificiations
-  const tx = Transactor(userProvider, gasPrice);
+  const tx = Notifier(userProvider, gasPrice);
 
   // Faucet Tx can be used to send funds from the faucet
-  const faucetTx = Transactor(localProvider, gasPrice);
+  const faucetTx = Notifier(localProvider, gasPrice);
 
   // 🏗 scaffold-eth is full of handy hooks like this one to get your balance:
   const yourLocalBalance = useBalance(localProvider, address);
@@ -146,11 +151,11 @@ function App(props: AppProps) {
   if (DEBUG) console.log('💵 yourMainnetBalance', yourMainnetBalance ? formatEther(yourMainnetBalance) : '...');
 
   // Load in your local 📝 contract and read a value from it:
-  const readContracts = useContractLoader(localProvider);
+  const readContracts = useContractLoader({ provider: localProvider }) || {};
   if (DEBUG) console.log('📝 readContracts', readContracts);
 
   // If you want to make 🔐 write transactions to your contracts, use the userProvider:
-  const writeContracts = useContractLoader(userProvider);
+  const writeContracts = useContractLoader({ provider: localProvider });
   if (DEBUG) console.log('🔐 writeContracts', writeContracts);
 
   // EXTERNAL CONTRACT EXAMPLE:
@@ -160,7 +165,10 @@ function App(props: AppProps) {
   console.log('🌍 DAI contract on mainnet:', mainnetDAIContract);
   //
   // Then read your DAI balance like:
-  const myMainnetDAIBalance = useContractReader({ DAI: mainnetDAIContract }, 'DAI', 'balanceOf', [
+  let myMainnetDAIBalance;
+  const readerContracts: { [key: string]: Contract } = {};
+  if (mainnetDAIContract) readerContracts.DAI = mainnetDAIContract;
+  myMainnetDAIBalance = useContractReader(readerContracts, 'DAI', 'balanceOf', [
     '0x34aA3F359A9D614239015126635CE7732c18fDF3',
   ]);
   console.log('🥇 myMainnetDAIBalance:', myMainnetDAIBalance);
@@ -186,8 +194,8 @@ function App(props: AppProps) {
           message="⚠️ Wrong Network"
           description={
             <div>
-              You have <b>{NETWORK(selectedChainId).name}</b> selected and you need to be on{' '}
-              <b>{NETWORK(localChainId).name}</b>.
+              You have <b>{NETWORK(selectedChainId)?.name}</b> selected and you need to be on{' '}
+              <b>{NETWORK(localChainId)?.name}</b>.
             </div>
           }
           type="error"
@@ -327,13 +335,15 @@ function App(props: AppProps) {
                 and give you a form to interact with it locally
             */}
 
-            <ContractComponent
-              name="YourContract"
-              signer={userProvider.getSigner()}
-              provider={localProvider}
-              address={address}
-              blockExplorer={blockExplorer}
-            />
+            {userProvider && (
+              <ContractComponent
+                name="YourContract"
+                signer={userProvider.getSigner()}
+                provider={localProvider}
+                address={address}
+                blockExplorer={blockExplorer}
+              />
+            )}
 
             {/* uncomment for a second contract:
             <ContractComponent
@@ -361,7 +371,7 @@ function App(props: AppProps) {
               address={address}
               yourLocalBalance={yourLocalBalance}
               mainnetProvider={mainnetProvider}
-              price={price}
+              price={ethPrice}
             />
           </Route>
           <Route path="/exampleui">
@@ -371,7 +381,7 @@ function App(props: AppProps) {
               mainnetProvider={mainnetProvider}
               localProvider={localProvider}
               yourLocalBalance={yourLocalBalance}
-              price={price}
+              price={ethPrice}
               tx={tx}
               writeContracts={writeContracts}
               readContracts={readContracts}
@@ -379,24 +389,24 @@ function App(props: AppProps) {
               setPurposeEvents={setPurposeEvents}
             />
           </Route>
-          <Route path="/mainnetdai">
+          {/* <Route path="/mainnetdai">
             <ContractComponent
               name="DAI"
               customContract={mainnetDAIContract}
-              signer={userProvider.getSigner()}
+              signer={userProvider?.getSigner()}
               provider={mainnetProvider}
               address={address}
               blockExplorer="https://etherscan.io/"
             />
-          </Route>
-          <Route path="/subgraph">
+          </Route> */}
+          {/* <Route path="/subgraph">
             <Subgraph
               subgraphUri={props.subgraphUri}
               tx={tx}
               writeContracts={writeContracts}
               mainnetProvider={mainnetProvider}
             />
-          </Route>
+          </Route> */}
         </Switch>
       </BrowserRouter>
 
@@ -409,7 +419,7 @@ function App(props: AppProps) {
           localProvider={localProvider}
           userProvider={userProvider}
           mainnetProvider={mainnetProvider}
-          price={price}
+          price={ethPrice}
           web3Modal={web3Modal}
           loadWeb3Modal={loadWeb3Modal}
           logoutOfWeb3Modal={logoutOfWeb3Modal}
@@ -421,12 +431,10 @@ function App(props: AppProps) {
       {/* 🗺 Extra UI like gas price, eth price, faucet, and support: */}
       <div style={{ position: 'fixed', textAlign: 'left', left: 0, bottom: 20, padding: 10 }}>
         <Row align="middle" gutter={[4, 4]}>
-          <Col span={8}>
-            <Ramp price={price} address={address} networks={NETWORKS} />
-          </Col>
+          <Col span={8}>{/* <Ramp price={ethPrice} address={address} networks={NETWORKS} /> */}</Col>
 
           <Col span={8} style={{ textAlign: 'center', opacity: 0.8 }}>
-            <GasGauge gasPrice={gasPrice} />
+            {/* <GasGauge gasPrice={gasPrice} /> */}
           </Col>
           <Col span={8} style={{ textAlign: 'center', opacity: 1 }}>
             <Button
@@ -448,11 +456,11 @@ function App(props: AppProps) {
           <Col span={24}>
             {
               /*  if the local provider has a signer, let's show the faucet:  */
-              faucetAvailable ? (
-                <Faucet localProvider={localProvider} price={price} ensProvider={mainnetProvider} />
-              ) : (
-                ''
-              )
+              // faucetAvailable ? (
+              //   <Faucet localProvider={localProvider} price={ethPrice} ensProvider={mainnetProvider} />
+              // ) : (
+              //   ''
+              // )
             }
           </Col>
         </Row>

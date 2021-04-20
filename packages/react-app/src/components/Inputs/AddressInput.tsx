@@ -3,7 +3,7 @@ import * as QrReader from 'react-qr-reader';
 import { CameraOutlined, QrcodeOutlined } from '@ant-design/icons';
 import { Input, Badge } from 'antd';
 import { useLookupAddress } from 'eth-hooks';
-import Blockie from './Blockie';
+import Blockie from '../Blockie';
 import { Provider } from '@ethersproject/providers';
 
 const { useState, useCallback } = React;

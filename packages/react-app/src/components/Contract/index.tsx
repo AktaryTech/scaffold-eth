@@ -5,7 +5,7 @@ import Account from '../Account';
 import DisplayVariable from './DisplayVariable';
 import FunctionForm from './FunctionForm';
 import { BigNumber, Contract as EthContract, Signer } from 'ethers';
-import { Provider, JsonRpcProvider } from '@ethersproject/providers';
+import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
 import { CardSize } from 'antd/lib/card';
 
 const { useMemo, useState } = React;
@@ -54,10 +54,10 @@ interface ContractProps {
   account?: string;
   gasPrice?: BigNumber;
   signer: Signer;
-  provider: JsonRpcProvider;
+  provider: JsonRpcProvider | Web3Provider;
   name: string;
   show?: string[];
-  price: number;
+  price?: number;
   blockExplorer: string;
 }
 
@@ -72,7 +72,7 @@ const Contract = ({
   price,
   blockExplorer,
 }: ContractProps) => {
-  const contracts: any = useContractLoader(provider);
+  const contracts: any = useContractLoader({ provider });
   let contract: EthContract;
   if (!customContract) {
     contract = contracts ? contracts[name] : '';

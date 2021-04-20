@@ -1,7 +1,7 @@
 /* eslint-disable import/no-dynamic-require */
 /* eslint-disable global-require */
 import { Contract } from '@ethersproject/contracts';
-import { JsonRpcProvider } from '@ethersproject/providers';
+import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
 import { useState, useEffect } from 'react';
 
 /*
@@ -22,7 +22,7 @@ import { useState, useEffect } from 'react';
   - Specify mainnetProvider
   - Specify DAI_ADDRESS and DAI_ABI, you can load/write them using constants.js
 */
-export default function useExternalContractLoader(provider: JsonRpcProvider, address: string, ABI: any, optionalBytecode: any) {
+export default function useExternalContractLoader(provider: Web3Provider | JsonRpcProvider, address: string, ABI: any, optionalBytecode?: any) {
   const [contract, setContract] = useState<Contract>();
   useEffect(() => {
     async function loadContract() {
@@ -38,7 +38,7 @@ export default function useExternalContractLoader(provider: JsonRpcProvider, add
           }
 
           const customContract = new Contract(address, ABI, signer);
-          if (optionalBytecode) customContract.bytecode = optionalBytecode;
+          // if (optionalBytecode) customContract.bytecode = optionalBytecode;
 
           setContract(customContract);
         } catch (e) {

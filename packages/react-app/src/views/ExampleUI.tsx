@@ -6,22 +6,23 @@ import { SyncOutlined } from '@ant-design/icons';
 import { parseEther, formatEther } from '@ethersproject/units';
 import { Address, Balance } from '../components';
 import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
-import { BigNumberish, Contract } from 'ethers';
+import { BigNumber, BigNumberish } from 'ethers';
+import { Contract  } from '@ethersproject/contracts';
 
 const { useState } = React;
 
 interface ExampleUIProps {
-  purpose: string;
+  purpose?: string;
   address: string;
   mainnetProvider: Web3Provider | JsonRpcProvider;
   localProvider: Web3Provider | JsonRpcProvider;
-  userProvider: Web3Provider | JsonRpcProvider;
-  yourLocalBalance: BigNumberish;
+  userProvider?: Web3Provider | JsonRpcProvider;
+  yourLocalBalance: BigNumber | undefined;
   price: number;
   setPurposeEvents: any[];
-  readContracts: { [key: string]: Contract };
-  writeContracts: { [key: string]: Contract };
-  tx(...args: any[]): void,
+  readContracts?: { [key: string]: Contract };
+  writeContracts?: { [key: string]: Contract };
+  tx(tx: any[]): Promise<any>,
 }
 
 export default function ExampleUI({

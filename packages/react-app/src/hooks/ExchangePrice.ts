@@ -3,7 +3,7 @@ import { Token, WETH, Fetcher, Route } from '@uniswap/sdk';
 import { usePoller } from 'eth-hooks';
 import { JsonRpcProvider } from '@ethersproject/providers';
 
-export default function useExchangePrice(targetNetwork: { price?: number }, mainnetProvider: JsonRpcProvider, pollTime: number) {
+export default function useExchangePrice(targetNetwork: { price?: number }, mainnetProvider: JsonRpcProvider, pollTime?: number) {
   const [price, setPrice] = useState(0);
 
   const pollPrice = () => {

@@ -5,12 +5,12 @@ import * as QR from 'qrcode.react';
 import { parseEther } from '@ethersproject/units';
 import { useUserAddress } from 'eth-hooks';
 import { BytesLike, ethers } from 'ethers';
-import { Transactor } from '../helpers';
+import { Notifier } from '../helpers';
 import Address from './Address';
 import Balance from './Balance';
-import AddressInput from './AddressInput';
-import EtherInput from './EtherInput';
-import { Provider, Web3Provider } from '@ethersproject/providers';
+import AddressInput from './Inputs/AddressInput';
+import EtherInput from './Inputs/EtherInput';
+import { JsonRpcProvider, Provider, Web3Provider } from '@ethersproject/providers';
 import { SigningKey } from '@ethersproject/signing-key';
 
 const { useState } = React;
@@ -46,10 +46,10 @@ const { Text, Paragraph } = Typography;
 */
 
 interface WalletProps {
-  provider: Web3Provider;
+  provider: Web3Provider | JsonRpcProvider;
   address: string;
   color?: string;
-  price: number;
+  price?: number;
   ensProvider: Provider;
 }
 
@@ -124,7 +124,7 @@ export default function Wallet(props: WalletProps) {
       </Button>
     );
   } else if (pk) {
-    const _pk = localStorage.getItem('metaPrivateKey');
+    const _pk = localStorage.getItem('metaPrivateKey') as BytesLike | SigningKey;
     const wallet = new ethers.Wallet(_pk);
 
     if (wallet.address !== selectedAddress) {
@@ -325,7 +325,7 @@ export default function Wallet(props: WalletProps) {
             disabled={!!!amount || !!!toAddress || !!qr}
             loading={false}
             onClick={() => {
-              const tx = Transactor(props.provider);
+              const tx = Notifier(props.provider);
 
               let value;
               try {

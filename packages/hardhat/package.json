@@ -8,7 +8,9 @@
     "eslint-config-airbnb": "^18.2.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-babel": "^5.3.1",
-    "eslint-plugin-prettier": "^3.1.4"
+    "eslint-plugin-prettier": "^3.1.4",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.2.4"
   },
   "dependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.0",
@@ -30,9 +32,9 @@
     "fork": "hardhat node --fork https://mainnet.infura.io/v3/460f40a260564ac4a4f4b3fffb032dad",
     "test": "hardhat test --network hardhat",
     "compile": "hardhat compile",
-    "deploy": "hardhat run scripts/deploy.js",
-    "postdeploy": "hardhat run scripts/publish.js",
-    "watch": "node scripts/watch.js",
+    "deploy": "hardhat run scripts/deploy.ts",
+    "postdeploy": "hardhat run scripts/publish.ts",
+    "watch": "node scripts/watch.ts",
     "accounts": "hardhat accounts",
     "balance": "hardhat balance",
     "send": "hardhat send",

@@ -4,7 +4,7 @@ import { useThemeSwitcher } from 'react-css-theme-switcher';
 import Address from './Address';
 import Balance from './Balance';
 import Wallet from './Wallet';
-import { Provider } from '@ethersproject/providers';
+import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
 
 /*
   ~ What does it do? ~
@@ -42,11 +42,11 @@ import { Provider } from '@ethersproject/providers';
 
 interface AccountProps {
   address: string;
-  userProvider?: Provider;
-  localProvider: Provider;
-  injectedProvider: Provider;
-  mainnetProvider: Provider;
-  price: number;
+  userProvider?: Web3Provider | JsonRpcProvider;
+  localProvider: Web3Provider | JsonRpcProvider;
+  injectedProvider?: Web3Provider | JsonRpcProvider;
+  mainnetProvider: Web3Provider | JsonRpcProvider;
+  price?: number;
   minimized?: boolean;
   web3Modal?: any;
   loadWeb3Modal?(): void;
@@ -109,13 +109,15 @@ export default function Account({
         'Connecting...'
       )}
       <Balance address={address} provider={localProvider} price={price} />
-      <Wallet
-        address={address}
-        provider={userProvider}
-        ensProvider={mainnetProvider}
-        price={price}
-        color={currentTheme === 'light' ? '#1890ff' : '#2caad9'}
-      />
+      {userProvider && 
+        <Wallet
+          address={address}
+          provider={userProvider}
+          ensProvider={mainnetProvider}
+          price={price}
+          color={currentTheme === 'light' ? '#1890ff' : '#2caad9'}
+        />
+      }
     </span>
   );
 

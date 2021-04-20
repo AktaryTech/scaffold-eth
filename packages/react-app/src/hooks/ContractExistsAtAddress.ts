@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { isAddress } from '@ethersproject/address';
-import { Provider } from '@ethersproject/providers';
+import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
 
 /*
   ~ What does it do? ~
@@ -17,7 +17,7 @@ import { Provider } from '@ethersproject/providers';
   - Change provider to check contract address on different chains (ex. mainnetProvider)
 */
 
-const useContractExistsAtAddress = (provider: Provider, contractAddress: string) => {
+const useContractExistsAtAddress = (provider: Web3Provider | JsonRpcProvider, contractAddress: string) => {
   const [contractIsDeployed, setContractIsDeployed] = useState(false);
 
   // We can look at the blockchain and see what's stored at `contractAddress`
@@ -28,8 +28,9 @@ const useContractExistsAtAddress = (provider: Provider, contractAddress: string)
     const checkDeployment = async () => {
       if (!isAddress(contractAddress)) return false;
       const bytecode = await provider.getCode(contractAddress);
-      setContractIsDeployed(bytecode !== '0x0');
-      return true;
+      const result = bytecode !== '0x0';
+      setContractIsDeployed(result);
+      return result;
     };
     if (provider) checkDeployment();
   }, [provider, contractAddress]);

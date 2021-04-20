@@ -5,7 +5,7 @@ import * as React from 'react';
 import { BigNumber } from '@ethersproject/bignumber';
 import { Row, Col, Input, Divider, Tooltip, Button } from 'antd';
 import Blockies from 'react-blockies';
-import { Transactor } from '../../helpers';
+import { Notifier } from '../../helpers';
 import tryToDisplay from './utils';
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { utils } from 'ethers';
@@ -28,7 +28,7 @@ const FunctionForm = ({ contractFunction, functionInfo, provider, gasPrice, trig
   const [txValue, setTxValue] = useState<string>('');
   const [returnValue, setReturnValue] = useState<string>('');
 
-  const tx = Transactor(provider, gasPrice);
+  const tx = Notifier(provider, gasPrice);
 
   let inputIndex = 0;
   const inputs = functionInfo.inputs.map((input: { name: string; type: string }) => {

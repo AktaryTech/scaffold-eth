@@ -6,14 +6,14 @@ import { Select } from 'antd';
 import { Address, AddressInput } from '../components';
 import { useTokenList } from '../hooks';
 import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
-import { BigNumberish } from 'ethers';
+import { BigNumber, BigNumberish } from 'ethers';
 
 const { useState } = React;
 
 const { Option } = Select;
 
 interface HintsProps {
-  yourLocalBalance: BigNumberish;
+  yourLocalBalance?: BigNumber;
   mainnetProvider: Web3Provider | JsonRpcProvider;
   price: number;
   address: string;

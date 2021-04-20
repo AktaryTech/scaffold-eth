@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
-import { Provider, Web3Provider } from '@ethersproject/providers';
-import BurnerProvider from 'burner-provider';
-import { INFURA_ID } from '../constants';
+import { JsonRpcProvider, Provider, Web3Provider } from '@ethersproject/providers';
+import * as BurnerProvider from 'burner-provider';
+import { INFURA_ID, NETWORKS } from '../constants';
 
 /*
   ~ What does it do? ~
@@ -18,16 +18,26 @@ import { INFURA_ID } from '../constants';
   - Specify the local provider
   - Usage examples:
     const address = useUserAddress(userProvider);
-    const tx = Transactor(userProvider, gasPrice)
+    const tx = Notifier(userProvider, gasPrice)
 */
 
-const useUserProvider = (injectedProvider: Web3Provider, localProvider: Web3Provider) =>
+const useUserProvider = (
+  injectedProvider?: Web3Provider | JsonRpcProvider,
+  localProvider?: Web3Provider | JsonRpcProvider,
+): Web3Provider | JsonRpcProvider =>
   useMemo(() => {
     if (injectedProvider) {
       console.log('🦊 Using injected provider');
       return injectedProvider;
     }
-    if (!localProvider) return undefined;
+    if (!localProvider) {
+      // 🏠 Your local provider is usually pointed at your local blockchain
+      const localProviderUrl = NETWORKS.localhost.rpcUrl;
+      // as you deploy to other networks you can set REACT_APP_PROVIDER=https://dai.poa.network in packages/react-app/.env
+      const localProviderUrlFromEnv = process.env.REACT_APP_PROVIDER ? process.env.REACT_APP_PROVIDER : localProviderUrl;
+      console.log('🏠 Connecting to provider:', localProviderUrlFromEnv);
+      localProvider = new JsonRpcProvider(localProviderUrlFromEnv);
+    }
 
     const burnerConfig: { [key: string]: any } = {};
 

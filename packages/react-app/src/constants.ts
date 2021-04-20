@@ -392,3 +392,8 @@ export const NETWORK = (chainId: number): INetwork | undefined => {
   }
   return;
 };
+
+export enum SpeedEnums {
+  Slow = 'slow',
+  Fast = 'fast',
+}

@@ -4,7 +4,7 @@ import Blockies from 'react-blockies';
 import { SendOutlined } from '@ant-design/icons';
 import { parseEther } from '@ethersproject/units';
 import { useLookupAddress } from 'eth-hooks';
-import { Transactor } from '../helpers';
+import { Notifier } from '../helpers';
 import Wallet from './Wallet';
 import { JsonRpcProvider, Provider } from '@ethersproject/providers';
 
@@ -78,7 +78,7 @@ export default function Faucet(props: FaucetProps) {
     [props.ensProvider, props.onChange],
   );
 
-  const tx = Transactor(props.localProvider);
+  const tx = Notifier(props.localProvider);
 
   return (
     <span>
